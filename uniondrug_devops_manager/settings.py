@@ -18,7 +18,7 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 # 加载 apps 路径
-import logging, os, sys
+import logging, os, sys, time
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,7 +46,9 @@ from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, ActiveDirector
 #修改Django认证先走ldap，再走本地认证
 AUTHENTICATION_BACKENDS = (
     "django_auth_ldap.backend.LDAPBackend",
-    "django.contrib.auth.backends.ModelBackend",
+    "django.contrib.auth.backends.AllowAllUsersModelBackend",
+    # "django.contrib.auth.backends.ModelBackend",
+
 )
 
 #ldap的连接基础配置
@@ -93,6 +95,7 @@ AUTH_LDAP_USER_ATTR_MAP = {
 
 INSTALLED_APPS = [
     'simpleui',
+    'multi_captcha_admin',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -106,7 +109,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -117,7 +120,7 @@ ROOT_URLCONF = 'uniondrug_devops_manager.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -177,6 +180,88 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+'''Session Configuration'''
+SESSION_COOKIE_AGE = 60 * 60 
+
+
+'''simpleui Configuration'''
+# 指定simpleui默认的主题,指定一个文件名，相对路径就从simpleui的theme目录读取
+SIMPLEUI_DEFAULT_THEME = 'highdmin.css'
+
+SIMPLEUI_LOGO = 'https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_png/KyXfCrME6UKe61SDRX94pnAwJfibZKK8HbSAnXnJo4ldiaEPooRqZrIgEICblKLRXxS12hXZw3x7dwstHnLtz9Dg/640?wx_fmt=png'
+
+# SIMPLEUI_HOME_PAGE = ''
+
+# SIMPLEUI_HOME_TITLE = '百度一下你就知道'
+
+# SIMPLEUI_HOME_ICON = 'fa fa-home'
+
+SIMPLEUI_HOME_ACTION = True
+SIMPLEUI_HOME_QUICK = True
+SIMPLEUI_HOME_INFO = False
+
+SIMPLEUI_CONFIG = {
+    'system_keep': False,
+    'menu_display': ['权限认证', '动态菜单测试'],      # 开启排序和过滤功能, 不填此字段为默认排序和全部显示, 空列表[] 为全部不显示.
+    'dynamic': True,    # 设置是否开启动态菜单, 默认为False. 如果开启, 则会在每次用户登陆时动态展示菜单内容
+    'menus': [{
+        'app': 'auth',
+        'name': '权限认证',
+        'icon': 'fas fa-user-shield',
+        'models': [{
+            'name': '用户',
+            'icon': 'fa fa-user',
+            'url': 'auth/user/'
+        }, {
+            'name': '用户组',
+            'icon': 'fa fa-users',
+            'url': 'auth/group/'
+        }]
+    }, {
+        'name': '动态菜单测试' ,
+        'icon': 'fa fa-desktop',
+        'models': [{
+            'name': time.time(),
+            'url': 'http://baidu.com',
+            'icon': 'far fa-surprise'
+        }]
+    }]
+}
+
+
+
+
+
+
+'''CAPTCHA Configuration'''
+# CAPTCHA_OUTPUT_FORMAT = u'%(text_field)s  %(hidden_field)s  %(image)s'
+
+CAPTCHA_NOISE_FUNCTIONS = (
+    # 'captcha.helpers.noise_null', # 没有样式
+    # 'captcha.helpers.noise_arcs', # 线
+    'captcha.helpers.noise_dots', # 点
+)
+
+MULTI_CAPTCHA_ADMIN = {
+    'engine': 'simple-captcha',
+}
+
+CAPTCHA_FIELD_TEMPLATE = os.path.join(BASE_DIR, 'templates/captcha', 'field.html')
+CAPTCHA_TEXT_FIELD_TEMPLATE = os.path.join(BASE_DIR, 'templates/captcha', 'text_field.html')
+CAPTCHA_IMAGE_TEMPLATE = os.path.join(BASE_DIR, 'templates/captcha', 'image.html')
+
+# 验证码图片大小
+CAPTCHA_IMAGE_SIZE = (78, 35)
+CAPTCHA_BACKGROUND_COLOR = '#ffffff'
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge' # 图片中的文字为随机英文字母，如 mdsh
+# CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'    # 图片中的文字为数字表达式，如1+2=</span>
+CAPTCHA_LENGTH = 4  # 字符个数
+CAPTCHA_TIMEOUT = 1  # 超时(minutes)
+
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
