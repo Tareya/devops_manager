@@ -35,7 +35,7 @@ SECRET_KEY = 'dx^to$8cc=7cm=&k5-qkb+q389%p56^+pujnsb!)6dbm^!k2wv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = "*"
+ALLOWED_HOSTS = ["*"]
 
 
 '''LDAP Configuration'''
